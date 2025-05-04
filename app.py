@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.express as px
 
 st.title("Licensed Drivers in the US Dashboard")
 st.checkbox('Click here to start') #allows user to interact with a checkbox
@@ -13,8 +14,8 @@ with st.expander("Data Preview"): #preview of data for user
     st.dataframe(df)
 
 st.subheader("Total Licensed Drivers by Age Group (2015-2017)")
-
-drivers_by_year = df.groupby("Year")["Drivers"].sum() / 1e6 #total drivers count for each year 
+#1 Horizontal bar chart 
+drivers_by_year = df.groupby("Year")["Drivers"].sum() / 1e6 #total drivers count for each year and adjusts the x-axis scale to not show 1e 
 drivers_by_cohort = df.groupby("Cohort")["Drivers"].sum().sort_values(ascending=False) / 1e6 
 #adds up every driver count in each age group
 
@@ -24,23 +25,26 @@ ax.set_xlabel("Number of Drivers(Millions)")
 ax.set_ylabel("Age Group")
 st.pyplot(fig)
 
-
 st.title("Total Drivers by State")
+#2 Bar chart
+nan_data = df[df['Year'].isna() | df['Drivers'].isna()]#nan values check
+print(nan_data)
 
-df = df[['Year', 'State', 'Drivers']].astype({'Year': 'int', 'Drivers': 'int'}) #ensure correct types especially for year
-
+df = df[['Year', 'State', 'Drivers']].dropna().astype({'Year': 'int', 'Drivers': 'int'}) #ensure correct types especially for year.Also removing my nan values
 
 year = st.slider(  #allows user to select a year using a slider
-    "Select Year",
+    "Select a Year",
     min_value=int(df.Year.min()),
     max_value=int(df.Year.max()),
     value=int(df.Year.min())
 )
 
-
 df_year = df[df.Year == year]
 by_state = df_year.groupby('State')['Drivers'].sum()
 
-st.subheader(f"Licensed Drivers in Year") #shows updated chart as soon as user uses the slider
+st.subheader(f"Licensed Drivers in {year}:") #shows updated chart as soon as user uses the slider
 st.bar_chart(by_state)
+
+st.title("Drivers by Sex and Year")
+#3 Side by side bar chart 
 
