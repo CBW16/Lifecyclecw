@@ -5,10 +5,10 @@ import seaborn as sns
 import plotly.express as px
 
 st.title("Licensed Drivers in the US Dashboard")
-st.checkbox('Click here to start') #allows user to interact with a checkbox
+st.checkbox('Click here to start') #allows user to interact with a checkbox *delete if unused
 
 df = pd.read_csv("Licensed_Drivers.csv")
-df = df.drop(columns=[col for col in df.columns if "Unnamed" in col])#removing unamed columns
+df = df.drop(columns=[col for col in df.columns if "Unnamed" in col])#removing unamed columns from preview
 
 with st.expander("Data Preview"): #preview of data for user
     st.dataframe(df)
@@ -26,11 +26,11 @@ ax.set_ylabel("Age Group")
 st.pyplot(fig)
 
 st.title("Total Drivers by State")
-#2 Bar chart
+#2 Bar chart     save best for last?
 nan_data = df[df['Year'].isna() | df['Drivers'].isna()]#nan values check
 print(nan_data)
 
-df = df[['Year', 'State', 'Drivers']].dropna().astype({'Year': 'int', 'Drivers': 'int'}) #ensure correct types especially for year.Also removing my nan values
+dfstate = df[['Year', 'State', 'Drivers']].dropna().astype({'Year': 'int', 'Drivers': 'int'}) #ensure correct types especially for year.Also removing my nan values
 
 year = st.slider(  #allows user to select a year using a slider
     "Select a Year",
@@ -46,5 +46,19 @@ st.subheader(f"Licensed Drivers in {year}:") #shows updated chart as soon as use
 st.bar_chart(by_state)
 
 st.title("Drivers by Sex and Year")
-#3 Side by side bar chart 
+#3 Side by side bar chart  adjust previous df
+fig = px.bar(
+   df.groupby(['Year', 'Sex'], as_index=False).sum(),
+   x='Year',
+   y='Drivers',
+   color='Sex',
+   color_discrete_map={'Male': 'light blue', 'Female': 'pink'},#find perfect blue
+   barmode='group',
+   height=400
+)
+st.plotly_chart(fig, use_container_width=True)
+
+st.title("")
+#4 Pie chart? 
+
 
