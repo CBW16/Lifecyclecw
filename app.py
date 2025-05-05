@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 
-st.title("Licensed Drivers in the US Dashboard")
-st.checkbox('Click here to start') #allows user to interact with a checkbox *delete if unused
+st.title("Licensed Drivers in the US Dashboard🇺🇸")
+st.markdown("Analyses licensed driver data by state, sex, and age group for the years 2015, 2016, and 2017.")
 
 df = pd.read_csv("Licensed_Drivers.csv")
 df = df.drop(columns=[col for col in df.columns if "Unnamed" in col])#removing unamed columns from preview
@@ -25,15 +25,15 @@ ax.set_xlabel("Number of Drivers(Millions)")
 ax.set_ylabel("Age Group")
 st.pyplot(fig)
 
-st.title("Total Drivers by State")
+st.title("Total Licensed Drivers by State")
 #2 Bar chart     save best for last?
 nan_data = df[df['Year'].isna() | df['Drivers'].isna()]#nan values check
-print(nan_data)
+print(nan_data) 
 
 dfstate = df[['Year', 'State', 'Drivers']].dropna().astype({'Year': 'int', 'Drivers': 'int'}) #ensure correct types especially for year.Also removing my nan values
 
 year = st.slider(  #allows user to select a year using a slider
-    "Select a Year",
+    "Select a Year:",    #move to title check         
     min_value=int(df.Year.min()),
     max_value=int(df.Year.max()),
     value=int(df.Year.min())
@@ -45,7 +45,7 @@ by_state = df_year.groupby('State')['Drivers'].sum()
 st.subheader(f"Licensed Drivers in {year}:") #shows updated chart as soon as user uses the slider
 st.bar_chart(by_state)
 
-st.title("Drivers by Sex and Year")
+st.title("Licensed Drivers by Sex Across Years")
 #3 Side by side bar chart  adjust previous df
 fig = px.bar(
    df.groupby(['Year', 'Sex'], as_index=False).sum(),
@@ -58,7 +58,11 @@ fig = px.bar(
 )
 st.plotly_chart(fig, use_container_width=True)
 
-st.title("")
-#4 Pie chart? 
-
-
+st.title("Distribution of Licensed Drivers by Year")
+#4 Pie chart             rearrange order check
+dfp = df.groupby("Year", as_index=False)["Drivers"].sum()
+pie_chart = px.pie(dfp,
+  values="Drivers",
+  names="Year",
+)
+st.plotly_chart(pie_chart)
